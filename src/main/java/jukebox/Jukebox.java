@@ -1,4 +1,4 @@
-package jukeboks;
+package jukebox;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -25,11 +25,11 @@ import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.managers.AudioManager;
 import secrets.Secrets;
 
-public class Jukeboks {
+public class Jukebox {
 	private final AudioPlayerManager playerManager;
 	private final Map<Long, GuildMusicManager> musicManagers;
 	
-	public Jukeboks() {
+	public Jukebox() {
 		this.musicManagers  = new HashMap<>();
 		this.playerManager = new DefaultAudioPlayerManager();
 		AudioSourceManagers.registerRemoteSources(playerManager);

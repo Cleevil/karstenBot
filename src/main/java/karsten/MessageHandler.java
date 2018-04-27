@@ -8,6 +8,8 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
+import jukebox.Jukebox;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,13 +20,11 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import net.dv8tion.jda.core.managers.AudioManager;
 
-import jukeboks.Jukeboks;
-
 public class MessageHandler extends ListenerAdapter{
-	private Jukeboks musicHandler;
+	private Jukebox musicHandler;
 	
 	public MessageHandler() {
-		musicHandler = new Jukeboks();
+		musicHandler = new Jukebox();
 	}
 	
 	@Override
