@@ -3,6 +3,7 @@ package karsten;
 import jukebox.Jukebox;
 
 import net.dv8tion.jda.core.entities.ChannelType;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -15,7 +16,7 @@ public class MessageHandler extends ListenerAdapter{
 	
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
-		// Karsten only understand text
+		// Only operate on text
 		if (!event.isFromType(ChannelType.TEXT)) {
 			return;
 		}
@@ -46,7 +47,7 @@ public class MessageHandler extends ListenerAdapter{
 			musicHandler.stop(chatMessage.textChannel);
 			break;
 		case REMOVE:
-			//TO DIS
+			//musicHandler.removeAt(chatMessage.argument);
 			break;
 		case LEAVE:
 			musicHandler.stop(chatMessage.textChannel);
@@ -55,12 +56,26 @@ public class MessageHandler extends ListenerAdapter{
 		case LIST:
 			musicHandler.list(chatMessage.textChannel);
 			break;
-		case HELP: // TODO: Should reply with a description of available commands
-			chatMessage.textChannel.sendMessage("To be implemented.").queue();
+		case HELP:
+			printHelp(chatMessage.textChannel);
 			break;
 		default:
 			System.out.println("Reached default case at message categorization");
 			break;
 		}
+	}
+	
+	// TODO: Find a better way
+	void printHelp(TextChannel channel) {
+		String helpStr = "Tillgängliga kommandon: \n"
+				+ "```\n"
+				+ "!ping       : pong \n"
+				+ "!play       : medium \n"
+				+ "!yt <query> : Search YouTube for <query> \n"
+				+ "!skip       : Skip current song \n"
+				+ "!stop       : Karsten stops \n"
+				+ "!leave      : Karsten leaves voice channel \n"
+				+ "```";
+		channel.sendMessage(helpStr).queue();
 	}
 }

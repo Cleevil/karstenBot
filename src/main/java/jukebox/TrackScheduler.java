@@ -32,6 +32,10 @@ public class TrackScheduler extends AudioEventAdapter {
 		player.startTrack(queue.poll(), false);
 	}
 	
+	public void removeAt(int position) {
+		
+	}
+	
 	/***
 	 * Call to get a display friendly sting of the queue
 	 * @return a printable Stirng for the queue

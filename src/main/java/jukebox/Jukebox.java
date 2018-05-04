@@ -76,7 +76,8 @@ public class Jukebox {
 		
 		JSONObject json = new JSONObject(content.toString());
 		
-		System.out.println("got: " + json);
+		// Debug message
+		//System.out.println("got: " + json);
 		loadAndPlay(channel, "https://www.youtube.com/watch?v="+json.getJSONArray("items").getJSONObject(0).getJSONObject("id").get("videoId"), author);
 	}
 	
@@ -151,6 +152,12 @@ public class Jukebox {
 		channel.sendMessage(currentList).queue();
 	}
 	
+	// TODO: remove track from list
+//	public void removeAt(TextChannel channel, int argument) {
+	
+//	}
+	
+	// For debug purposes
 	private static void connectToFirstVoiceChannel(AudioManager audioManager) {
 		if (!audioManager.isConnected() && !audioManager.isAttemptingToConnect()) {
 			for (VoiceChannel voiceChannel : audioManager.getGuild().getVoiceChannels()) {

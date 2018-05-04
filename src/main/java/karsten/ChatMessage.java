@@ -37,7 +37,6 @@ public class ChatMessage {
 		guild   	= event.getGuild();
 		
 		String message = event.getMessage().getContentDisplay();
-		System.out.println("Message: " + message);
 		
 		// Ignore message if it is not meant for Karsten
 		if (!message.startsWith("!") || author.isBot()) {
@@ -51,6 +50,7 @@ public class ChatMessage {
 			if (message.length() < 5) {
 				channel.sendMessage("Det eer et svii!ne dorligt link det der").queue();
 				msgKind = MessageKind.IGNORED;
+				return;
 			}
 			argument = message.substring(4, message.length());
 			msgKind = MessageKind.YOUTUBE;
@@ -68,7 +68,20 @@ public class ChatMessage {
 		else if (message.startsWith("!stop")) {
 			msgKind = MessageKind.STOP;
 		}
-		else if (message.startsWith("!rm") && message.length() < 5) {
+		else if (message.startsWith("!remove")) {
+			if (message.length() < 9) {
+				channel.sendMessage("Hva faen ska jeg dog fjerne?").queue();
+				msgKind = MessageKind.IGNORED;
+				return;
+			}
+			argument = message.substring(8, message.length());
+			int foo = 0;
+			try {
+			     foo = Integer.parseInt(argument);
+			     System.out.println("YES! The number is: " + foo);
+			} catch (NumberFormatException e) {
+			    System.out.println("Wrong number");
+			}
 			msgKind = MessageKind.REMOVE;
 		}
 		else if (message.startsWith("!leave")) {
@@ -81,7 +94,9 @@ public class ChatMessage {
 			msgKind = MessageKind.UNKNOWN;
 		}
 		
-		System.out.printf("[TRIPLE]: author: %s, msg: %s, channel: %s \n", author.getName(), message, channel.getName());
+		if (msgKind != MessageKind.IGNORED) {
+			System.out.printf("[TRIPLE]: Author: %s,\tmsg: %s,\tChannel: %s \n", author.getName(), message, channel.getName());
+		}
 	}
 	MessageKind getKind() {
 		return msgKind;
