@@ -4,11 +4,23 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '1.2.4'
 }
 
-mainClassName = 'com.example.jda.Bot'
+mainClassName = 'karsten.Program'
 
 version '1.0'
 
 sourceCompatibility = 1.8
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'KarstenBot': 'A Discord bot',  
+        	'Implementation-Version': version,
+        	'Main-Class': 'karsten.Program'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
 
 repositories {
   jcenter()
