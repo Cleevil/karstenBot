@@ -56,7 +56,12 @@ public class ChatMessage {
 			msgKind = MessageKind.YOUTUBE;
 		}
 		else if (message.startsWith("!play")) {
-			
+			if (message.length() > 6) { // TODO: Check if yt link to song or playlist
+				argument = message.substring(6, message.length());
+			}
+			else { // Default to medium song
+				argument = "https://youtu.be/mveqm_Snbzs";
+			}
 			msgKind = MessageKind.PLAY;
 		}
 		else if (message.startsWith("!skip")) {
@@ -68,7 +73,7 @@ public class ChatMessage {
 		else if (message.startsWith("!stop")) {
 			msgKind = MessageKind.STOP;
 		}
-		else if (message.startsWith("!remove")) {
+		else if (message.startsWith("!remove")) { // TODO: finish this
 			if (message.length() < 9) {
 				channel.sendMessage("Hva faen ska jeg dog fjerne?").queue();
 				msgKind = MessageKind.IGNORED;

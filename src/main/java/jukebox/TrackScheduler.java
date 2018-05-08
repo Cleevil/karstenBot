@@ -14,6 +14,8 @@ public class TrackScheduler extends AudioEventAdapter {
 	
 	public TrackScheduler(AudioPlayer player) {
 		this.player = player;
+		player.setVolume(50); // Avoid deafening new channel members
+		
 		this.queue = new LinkedBlockingQueue<>();
 	}
 	
@@ -38,7 +40,7 @@ public class TrackScheduler extends AudioEventAdapter {
 	
 	/***
 	 * Call to get a display friendly sting of the queue
-	 * @return a printable Stirng for the queue
+	 * @return a printable string for the queue
 	 */
 	public String getQueueAsString() {
 		String retString = "";

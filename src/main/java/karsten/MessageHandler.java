@@ -35,9 +35,11 @@ public class MessageHandler extends ListenerAdapter{
 			chatMessage.textChannel.sendMessage("Pong!").queue();
 			break;
 		case PLAY:
-			musicHandler.loadAndPlay(chatMessage.textChannel, "https://youtu.be/mveqm_Snbzs", chatMessage.author);
+			chatMessage.textChannel.sendMessage("Är det en melodi du har där?").queue();
+			musicHandler.loadAndPlay(chatMessage.textChannel, chatMessage.argument, chatMessage.author);
 			break;
 		case YOUTUBE:
+			chatMessage.textChannel.sendMessage("Låt mig se vad jag kan hitta ...").queue();
 			musicHandler.searchYoutube(event.getTextChannel(), chatMessage.argument, chatMessage.author);
 			break;
 		case SKIP:
@@ -68,13 +70,13 @@ public class MessageHandler extends ListenerAdapter{
 	// TODO: Find a better way
 	void printHelp(TextChannel channel) {
 		String helpStr = "Tillgängliga kommandon: \n"
-				+ "```\n"
-				+ "!ping       : pong \n"
-				+ "!play       : medium \n"
-				+ "!yt <query> : Search YouTube for <query> \n"
-				+ "!skip       : Skip current song \n"
-				+ "!stop       : Karsten stops \n"
-				+ "!leave      : Karsten leaves voice channel \n"
+				+ "```md\n" // Just to highlight something - http or md
+				+ "!ping        : pong \n"
+				+ "!play <link> : Plays given YouTube <link> \n"
+				+ "!yt <query>  : Search YouTube for <query> \n"
+				+ "!skip        : Skip current song \n"
+				+ "!stop        : Karsten stops \n"
+				+ "!leave       : Karsten leaves voice channel \n"
 				+ "```";
 		channel.sendMessage(helpStr).queue();
 	}
