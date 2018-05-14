@@ -23,6 +23,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.managers.AudioManager;
+import net.dv8tion.jda.core.managers.GuildManager;
 import secrets.Secrets;
 
 public class Jukebox {
@@ -55,7 +56,9 @@ public class Jukebox {
 		StringBuffer content = new StringBuffer();
 		
 		try {
-		URL url = new URL("https://www.googleapis.com/youtube/v3/search?key="+googleToken+"&q="+URLEncoder.encode(query, "UTF-8")+"&part=snippet&maxResults=1&type=video");
+		URL url = new URL("https://www.googleapis.com/youtube/v3/search?key="
+							+googleToken+"&q="+URLEncoder.encode(query, "UTF-8")
+							+"&part=snippet&maxResults=1&type=video");
 		HttpURLConnection con = (HttpURLConnection)url.openConnection();
 		con.setRequestMethod("GET");
 		con.setRequestProperty("Content-Type", "application/json");
@@ -78,7 +81,10 @@ public class Jukebox {
 		
 		// Debug message
 		//System.out.println("got: " + json);
-		loadAndPlay(channel, "https://www.youtube.com/watch?v="+json.getJSONArray("items").getJSONObject(0).getJSONObject("id").get("videoId"), author);
+		loadAndPlay(channel, 
+				"https://www.youtube.com/watch?v="
+				+ json.getJSONArray("items").getJSONObject(0).getJSONObject("id").get("videoId"), 
+				author);
 	}
 	
 	public void loadAndPlay(final TextChannel channel, final String trackUrl, User author) {
@@ -100,7 +106,10 @@ public class Jukebox {
 	          firstTrack = playlist.getTracks().get(0);
 	        }
 
-	        channel.sendMessage("Adding to queue " + firstTrack.getInfo().title + " (first track of playlist " + playlist.getName() + ")").queue();
+	        channel.sendMessage("Adding to queue " 
+	        					+ firstTrack.getInfo().title 
+	        					+ " (first track of playlist " 
+	        					+ playlist.getName() + ")").queue();
 
 	        play(channel.getGuild(), musicManager, firstTrack, author);
 	      }
@@ -121,8 +130,9 @@ public class Jukebox {
 	    //connectToFirstVoiceChannel(guild.getAudioManager());
 	    
 		connectRelevantChannel(guild.getAudioManager(), author);
-
-	    musicManager.scheduler.queue(track);
+		
+		Vote vote = new Vote(author.getId(), 1);
+	    musicManager.scheduler.queue(track, vote);
 	}
 	
 	public void skipTrack(TextChannel channel) {
@@ -188,5 +198,21 @@ public class Jukebox {
 				}
 			}
 		}
+	}
+
+	public void giveVote(TextChannel textChannel, User author, int voteValue) {
+		GuildMusicManager musicManager = getGuildAudioPlayer(textChannel.getGuild());
+		
+		// Check if currently playing
+		if (!musicManager.scheduler.isPlaying())
+		{
+			textChannel.sendMessage("Nothing is playing - nothing to upvote").queue();
+			return;
+		}
+		
+		Vote vote = new Vote(author.getId(), voteValue);
+		musicManager.scheduler.setVote(vote);
+		textChannel.sendMessage("Jag fick din omröstning. Aktuell poäng är: "
+				+ "**" + musicManager.scheduler.getVotes() + "**").queue();
 	}
 }

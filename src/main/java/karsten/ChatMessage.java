@@ -15,6 +15,8 @@ enum MessageKind {
 	YOUTUBE,
 	SKIP,
 	STOP,
+	UPVOTE,
+	DOWNVOTE,
 	REMOVE,
 	LEAVE,
 	LIST,
@@ -46,7 +48,7 @@ public class ChatMessage {
 			msgKind = MessageKind.PING;
 		}
 		// Must also have a search query
-		else if (message.startsWith("!yt")) { 
+		else if (message.startsWith("!yt") || message.startsWith("!youtube")) { 
 			if (message.length() < 5) {
 				channel.sendMessage("Det eer et svii!ne dorligt link det der").queue();
 				msgKind = MessageKind.IGNORED;
@@ -73,7 +75,13 @@ public class ChatMessage {
 		else if (message.startsWith("!stop")) {
 			msgKind = MessageKind.STOP;
 		}
-		else if (message.startsWith("!remove")) { // TODO: finish this
+		else if (message.startsWith("!uvote") || message.startsWith("!upvote") || message.startsWith("!uv")) {
+			msgKind = MessageKind.UPVOTE;
+		}
+		else if (message.startsWith("!dvote") || message.startsWith("!downvote") || message.startsWith("!dv")) {
+			msgKind = MessageKind.DOWNVOTE;
+		}
+		else if (message.startsWith("!remove")) { // TODO: finish this if its really needed
 			if (message.length() < 9) {
 				channel.sendMessage("Hva faen ska jeg dog fjerne?").queue();
 				msgKind = MessageKind.IGNORED;

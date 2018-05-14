@@ -11,22 +11,42 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 public class TrackScheduler extends AudioEventAdapter {
 	private final AudioPlayer player;
 	private final BlockingQueue<AudioTrack> queue;
+	private DemocraticPlaylist democraticPlaylist;
 	
 	public TrackScheduler(AudioPlayer player) {
 		this.player = player;
-		player.setVolume(50); // Avoid deafening new channel members
-		
 		this.queue = new LinkedBlockingQueue<>();
+		democraticPlaylist = new DemocraticPlaylist();
 	}
 	
-	public void queue(AudioTrack track) {
+	public void queue(AudioTrack track, Vote vote) {
+		democraticPlaylist.addTrack(track, vote);
+		
 		if (!player.startTrack(track, true)) {
 			queue.offer(track);
 		}
 	}
 	
 	public void nextTrack() {
-		player.startTrack(queue.poll(), false);
+		// Play from queue if its not empty
+		if (queue.peek() != null) {
+			player.startTrack(queue.poll(), false);
+			return;
+		}
+		// Otherwise go for the Democratic playlist
+		if (democraticPlaylist.isEmpty()) {
+			player.startTrack(queue.poll(), false);
+			return;
+		}
+		AudioTrack track = democraticPlaylist.getATrack();
+		player.startTrack(track, false); // Will stop if null
+	}
+	
+	public boolean isPlaying() {
+		if (player.getPlayingTrack() != null) {
+			return true;
+		}
+		return false;
 	}
 	
 	public void stopAll() {
@@ -34,6 +54,7 @@ public class TrackScheduler extends AudioEventAdapter {
 		player.startTrack(queue.poll(), false);
 	}
 	
+	// TODO: Is this even needed?
 	public void removeAt(int position) {
 		
 	}
@@ -59,8 +80,21 @@ public class TrackScheduler extends AudioEventAdapter {
 	
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+		// Remove from democratic playlist if it have too many downvotes
+		democraticPlaylist.evaluateTrack(track);
+			
 		if (endReason.mayStartNext) {
 			nextTrack();
 		}
+	}
+
+	public void setVote(Vote vote) {
+		AudioTrack curTrack = player.getPlayingTrack();
+		democraticPlaylist.castVote(curTrack, vote);
+	}
+
+	public int getVotes() {
+		AudioTrack track = player.getPlayingTrack();
+		return democraticPlaylist.getVotes(track);
 	}
 }

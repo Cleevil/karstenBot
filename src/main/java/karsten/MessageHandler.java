@@ -8,10 +8,10 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class MessageHandler extends ListenerAdapter{
-	private Jukebox musicHandler;
+	private Jukebox jukebox;
 	
 	public MessageHandler() {
-		musicHandler = new Jukebox();
+		jukebox = new Jukebox();
 	}
 	
 	@Override
@@ -36,27 +36,33 @@ public class MessageHandler extends ListenerAdapter{
 			break;
 		case PLAY:
 			chatMessage.textChannel.sendMessage("Är det en melodi du har där?").queue();
-			musicHandler.loadAndPlay(chatMessage.textChannel, chatMessage.argument, chatMessage.author);
+			jukebox.loadAndPlay(chatMessage.textChannel, chatMessage.argument, chatMessage.author);
 			break;
 		case YOUTUBE:
 			chatMessage.textChannel.sendMessage("Låt mig se vad jag kan hitta ...").queue();
-			musicHandler.searchYoutube(event.getTextChannel(), chatMessage.argument, chatMessage.author);
+			jukebox.searchYoutube(event.getTextChannel(), chatMessage.argument, chatMessage.author);
 			break;
 		case SKIP:
-			musicHandler.skipTrack(chatMessage.textChannel);
+			jukebox.skipTrack(chatMessage.textChannel);
 			break;
 		case STOP:
-			musicHandler.stop(chatMessage.textChannel);
+			jukebox.stop(chatMessage.textChannel);
+			break;
+		case UPVOTE:
+			jukebox.giveVote(chatMessage.textChannel, chatMessage.author, 1);
+			break;
+		case DOWNVOTE:
+			jukebox.giveVote(chatMessage.textChannel, chatMessage.author, -1);
 			break;
 		case REMOVE:
 			//musicHandler.removeAt(chatMessage.argument);
 			break;
 		case LEAVE:
-			musicHandler.stop(chatMessage.textChannel);
-			musicHandler.leave(chatMessage.guild, chatMessage.author);
+			jukebox.stop(chatMessage.textChannel);
+			jukebox.leave(chatMessage.guild, chatMessage.author);
 			break;
 		case LIST:
-			musicHandler.list(chatMessage.textChannel);
+			jukebox.list(chatMessage.textChannel);
 			break;
 		case HELP:
 			printHelp(chatMessage.textChannel);

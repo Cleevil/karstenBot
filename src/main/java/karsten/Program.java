@@ -9,13 +9,12 @@ import secrets.Secrets;
 
 public class Program {
 	public static void main(String[] args) {
-		System.out.println("Karsten flyver ind fron pilsnar land!");
-		
 		try {
 			JDA jda = new JDABuilder(AccountType.BOT)
 					.setToken(Secrets.getDiscordToken())
 					.addEventListener(new MessageHandler())
 					.buildBlocking();
+			System.out.println("Karsten flyver ind fron pilsnar land!");
 		}
 		catch(LoginException e) {
 			System.out.println("[Exception]: Login failed at main"); 
