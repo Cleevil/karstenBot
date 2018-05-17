@@ -2,6 +2,7 @@ package karsten;
 
 import javax.security.auth.login.LoginException;
 
+import database.DbManager;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -24,5 +25,7 @@ public class Program {
 			System.out.println("[Exception]: Failed at creating JDA at main"); 
 			e.printStackTrace();
 		}
+		
+		DbManager dbman = DbManager.getInstance();
 	}
 }
