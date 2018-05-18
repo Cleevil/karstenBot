@@ -1,9 +1,12 @@
 package database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+
+import jukebox.Vote;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.User;
 
 public class DbManager {
 	private static DbManager dbman = new DbManager();
@@ -42,5 +45,37 @@ public class DbManager {
 	
 	private void registerVote() {
 		
+	}
+	
+	private void tryInsert(Guild guild) {
+		Statement stmt = null;
+		
+		try {
+			
+		} catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	private void tryInsert(Vote vote) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void tryInsert(AudioTrack track) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void tryInsert(User author) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void updateBasedOnPlay(Guild guild, User author, AudioTrack track, Vote vote) {
+		tryInsert(guild);
+		tryInsert(author);
+		tryInsert(track);
+		tryInsert(vote);
 	}
 }

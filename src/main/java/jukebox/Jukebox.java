@@ -17,6 +17,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
+import database.DbManager;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -132,6 +133,7 @@ public class Jukebox {
 		connectRelevantChannel(guild.getAudioManager(), author);
 		
 		Vote vote = new Vote(author.getId(), 1);
+		DbManager.getInstance().updateBasedOnPlay(guild, author, track, vote);
 	    musicManager.scheduler.queue(track, vote);
 	}
 	
