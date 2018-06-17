@@ -48,7 +48,7 @@ public class ChatMessage {
 			msgKind = MessageKind.PING;
 		}
 		// Must also have a search query
-		else if (message.startsWith("!yt") || message.startsWith("!youtube")) { 
+		else if (message.toLowerCase().startsWith("!yt") || message.toLowerCase().startsWith("!youtube")) { 
 			if (message.length() < 5) {
 				channel.sendMessage("Det eer et svii!ne dorligt link det der").queue();
 				msgKind = MessageKind.IGNORED;

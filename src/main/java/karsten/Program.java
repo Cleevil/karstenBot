@@ -15,7 +15,6 @@ public class Program {
 					.setToken(Secrets.getDiscordToken())
 					.addEventListener(new MessageHandler())
 					.buildBlocking();
-			System.out.println("Karsten flyver ind fron pilsnar land!");
 		}
 		catch(LoginException e) {
 			System.out.println("[Exception]: Login failed at main"); 
@@ -25,7 +24,7 @@ public class Program {
 			System.out.println("[Exception]: Failed at creating JDA at main"); 
 			e.printStackTrace();
 		}
-		
 		DbManager dbman = DbManager.getInstance();
+		System.out.println("Karsten flyver ind fron pilsnar land!");
 	}
 }

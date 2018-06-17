@@ -29,7 +29,7 @@ public class MessageHandler extends ListenerAdapter{
 		case IGNORED:
 			break;
 		case UNKNOWN:
-			chatMessage.textChannel.sendMessage("Hva faen e det for en kommendo?").queue();
+			chatMessage.textChannel.sendMessage("Hva faen e det for en kommendo? Preov '**!help**'").queue();
 			break;
 		case PING:
 			chatMessage.textChannel.sendMessage("Pong!").queue();

@@ -8,4 +8,12 @@ public class Vote {
 		this.userId = userId;
 		this.voteValue = vote;
 	}
+	
+	public String getUserId() {
+		return userId;
+	}
+	
+	public int getVoteValue() {
+		return voteValue;
+	}
 }

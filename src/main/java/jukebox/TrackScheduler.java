@@ -8,26 +8,26 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
+import net.dv8tion.jda.core.entities.Guild;
+
 public class TrackScheduler extends AudioEventAdapter {
 	private final AudioPlayer player;
 	private final BlockingQueue<AudioTrack> queue;
-	private DemocraticPlaylist democraticPlaylist;
+	private DemocraticPlaylistDB democraticPlaylist;
 	
-	public TrackScheduler(AudioPlayer player) {
+	public TrackScheduler(AudioPlayer player, Guild guild) {
 		this.player = player;
 		this.queue = new LinkedBlockingQueue<>();
-		democraticPlaylist = new DemocraticPlaylist();
+		democraticPlaylist = new DemocraticPlaylistDB(guild);
 	}
 	
 	public void queue(AudioTrack track, Vote vote) {
-		democraticPlaylist.addTrack(track, vote);
-		
 		if (!player.startTrack(track, true)) {
 			queue.offer(track);
 		}
 	}
 	
-	public void nextTrack() {
+	public void nextTrack(AudioTrack previousTrack) {
 		// Play from queue if its not empty
 		if (queue.peek() != null) {
 			player.startTrack(queue.poll(), false);
@@ -38,7 +38,7 @@ public class TrackScheduler extends AudioEventAdapter {
 			player.startTrack(queue.poll(), false);
 			return;
 		}
-		AudioTrack track = democraticPlaylist.getATrack();
+		AudioTrack track = democraticPlaylist.getARandomTrack(previousTrack);
 		player.startTrack(track, false); // Will stop if null
 	}
 	
@@ -81,20 +81,21 @@ public class TrackScheduler extends AudioEventAdapter {
 	@Override
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
 		// Remove from democratic playlist if it have too many downvotes
+		//democraticPlaylist.evaluateTrack(track);
 		democraticPlaylist.evaluateTrack(track);
 			
 		if (endReason.mayStartNext) {
-			nextTrack();
+			nextTrack(track);
 		}
 	}
 
-	public void setVote(Vote vote) {
-		AudioTrack curTrack = player.getPlayingTrack();
-		democraticPlaylist.castVote(curTrack, vote);
-	}
-
-	public int getVotes() {
+	public int getVoteTally(Guild guild) {
 		AudioTrack track = player.getPlayingTrack();
-		return democraticPlaylist.getVotes(track);
+		int tally = democraticPlaylist.getVoteTally(track);
+		return tally;
+	}
+	
+	public final AudioTrack getPlayingTrack() {
+		return player.getPlayingTrack();
 	}
 }

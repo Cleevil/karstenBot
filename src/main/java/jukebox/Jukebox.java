@@ -43,7 +43,7 @@ public class Jukebox {
 		GuildMusicManager musicManager = musicManagers.get(guildId);
 		
 		if (musicManager == null) {
-			musicManager = new GuildMusicManager(playerManager);
+			musicManager = new GuildMusicManager(playerManager, guild);
 			musicManagers.put(guildId, musicManager);
 		}
 		
@@ -57,31 +57,37 @@ public class Jukebox {
 		StringBuffer content = new StringBuffer();
 		
 		try {
-		URL url = new URL("https://www.googleapis.com/youtube/v3/search?key="
-							+googleToken+"&q="+URLEncoder.encode(query, "UTF-8")
-							+"&part=snippet&maxResults=1&type=video");
-		HttpURLConnection con = (HttpURLConnection)url.openConnection();
-		con.setRequestMethod("GET");
-		con.setRequestProperty("Content-Type", "application/json");
-		
-		int status = con.getResponseCode();
-		if (status != 200) {
-			return;
-		}
-		BufferedReader in = new BufferedReader( new InputStreamReader(con.getInputStream()));
-		String inputLine;
-		content = new StringBuffer();
-		while ((inputLine = in.readLine()) != null) {
-		    content.append(inputLine);
-		}
-		in.close();
-		con.disconnect();
-		} catch (Exception e) { System.out.println("Felj: " + e.getMessage()); }
+			URL url = new URL("https://www.googleapis.com/youtube/v3/search?key="
+								+googleToken+"&q="+URLEncoder.encode(query, "UTF-8")
+								+"&part=snippet&maxResults=1&type=video");
+			HttpURLConnection con = (HttpURLConnection)url.openConnection();
+			con.setRequestMethod("GET");
+			con.setRequestProperty("Content-Type", "application/json");
+			
+			
+			int status = con.getResponseCode();
+			if (status != 200) {
+				return;
+			}
+			BufferedReader in = new BufferedReader( new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			content = new StringBuffer();
+			while ((inputLine = in.readLine()) != null) {
+			    content.append(inputLine);
+			}
+			in.close();
+			con.disconnect();
+		} catch (Exception e) 
+			{ System.out.println("Search Youtube exception: " + e.getMessage()); }
 		
 		JSONObject json = new JSONObject(content.toString());
 		
-		// Debug message
-		//System.out.println("got: " + json);
+		// There might be no result
+		if (json.getJSONArray("items").isNull(0)) {
+			channel.sendMessage("Wat..").queue();
+			return;
+		}
+		
 		loadAndPlay(channel, 
 				"https://www.youtube.com/watch?v="
 				+ json.getJSONArray("items").getJSONObject(0).getJSONObject("id").get("videoId"), 
@@ -90,6 +96,8 @@ public class Jukebox {
 	
 	public void loadAndPlay(final TextChannel channel, final String trackUrl, User author) {
 	    GuildMusicManager musicManager = getGuildAudioPlayer(channel.getGuild());
+	    
+	    System.out.println("YouTube ID: " + trackUrl);
 
 	    playerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
 	      @Override
@@ -128,18 +136,22 @@ public class Jukebox {
 	}
 	
 	private void play(Guild guild, GuildMusicManager musicManager, AudioTrack track, User author) {
-	    //connectToFirstVoiceChannel(guild.getAudioManager());
-	    
 		connectRelevantChannel(guild.getAudioManager(), author);
 		
 		Vote vote = new Vote(author.getId(), 1);
+		
+		// Insert vote for database
 		DbManager.getInstance().updateBasedOnPlay(guild, author, track, vote);
+		
 	    musicManager.scheduler.queue(track, vote);
 	}
 	
 	public void skipTrack(TextChannel channel) {
 		GuildMusicManager musicManager = getGuildAudioPlayer(channel.getGuild());
-		musicManager.scheduler.nextTrack();
+		AudioTrack track = musicManager.getPlayingTrack();
+		musicManager.scheduler.nextTrack(track);
+		
+		// TODO: Make table for stat tracking in DB
 		
 		channel.sendMessage("Hoppa över till nästa låten.").queue();
 	}
@@ -153,21 +165,19 @@ public class Jukebox {
 	
 	public void list(TextChannel channel) {
 		GuildMusicManager musicManager = getGuildAudioPlayer(channel.getGuild());
-		String queue =  musicManager.scheduler.getQueueAsString();
+		String stringQueue =  musicManager.scheduler.getQueueAsString();
 		
-		if (queue.isEmpty()) {
-			System.out.println("yes");
-		}
 		String currentList = "Current Tracks in queue:\n```";
-		currentList += queue;
-		currentList += "```";
+		if (stringQueue.isEmpty()) {
+			currentList += "Queue is empty";
+			currentList += " ```";
+		}
+		else {
+			currentList += stringQueue;
+			currentList += "```";
+		}
 		channel.sendMessage(currentList).queue();
 	}
-	
-	// TODO: remove track from list
-//	public void removeAt(TextChannel channel, int argument) {
-	
-//	}
 	
 	// For debug purposes
 	private static void connectToFirstVoiceChannel(AudioManager audioManager) {
@@ -213,8 +223,15 @@ public class Jukebox {
 		}
 		
 		Vote vote = new Vote(author.getId(), voteValue);
-		musicManager.scheduler.setVote(vote);
+		// Add vote to DB
+		// TODO: is a specialised function needed for votes?
+		DbManager.getInstance().updateBasedOnPlay(
+				textChannel.getGuild(), 
+				author, 
+				musicManager.getPlayingTrack(), 
+				vote);
+		
 		textChannel.sendMessage("Jag fick din omröstning. Aktuell poäng är: "
-				+ "**" + musicManager.scheduler.getVotes() + "**").queue();
+				+ "**" + musicManager.scheduler.getVoteTally(textChannel.getGuild()) + "**").queue();
 	}
 }
