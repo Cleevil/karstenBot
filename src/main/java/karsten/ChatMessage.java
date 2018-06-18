@@ -15,6 +15,7 @@ enum MessageKind {
 	YOUTUBE,
 	SKIP,
 	STOP,
+	SONGINFO,
 	UPVOTE,
 	DOWNVOTE,
 	REMOVE,
@@ -74,6 +75,9 @@ public class ChatMessage {
 		}
 		else if (message.startsWith("!stop")) {
 			msgKind = MessageKind.STOP;
+		}
+		else if (message.startsWith("!song")) {
+			msgKind = MessageKind.SONGINFO;
 		}
 		else if (message.startsWith("!uvote") || message.startsWith("!upvote") || message.startsWith("!uv")) {
 			msgKind = MessageKind.UPVOTE;

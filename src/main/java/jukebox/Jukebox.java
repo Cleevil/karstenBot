@@ -23,6 +23,8 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.core.managers.AudioManager;
 import net.dv8tion.jda.core.managers.GuildManager;
 import secrets.Secrets;
@@ -233,5 +235,38 @@ public class Jukebox {
 		
 		textChannel.sendMessage("Jag fick din omröstning. Aktuell poäng är: "
 				+ "**" + musicManager.scheduler.getVoteTally(textChannel.getGuild()) + "**").queue();
+	}
+
+	/**
+	 * Called whenever someone leaves a voice channel.
+	 * Used to make Karsten leave when there are nobody
+	 * to play music for. 
+	 * @param event
+	 */
+	public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
+		boolean karstenMemberStatus = false;
+		int memberCount = 0;
+		
+		for (Member member : event.getChannelLeft().getMembers()) {
+			if (!member.getUser().getId().toString().equals("323258374160515072")) { // Karstens ID
+				memberCount++;
+			} else {
+				karstenMemberStatus = true;
+			}
+		}
+
+		if (karstenMemberStatus && memberCount == 0) {
+			GuildMusicManager musicManager = getGuildAudioPlayer(event.getGuild());
+			musicManager.scheduler.stopAll();
+			
+			event.getGuild().getAudioManager().closeAudioConnection();
+		}
+	}
+
+	public void songInfo(TextChannel textChannel) {
+		// TODO Auto-generated method stub
+		GuildMusicManager musicManager = getGuildAudioPlayer(textChannel.getGuild());
+		AudioTrack track = musicManager.getPlayingTrack();
+		textChannel.sendMessage("Jag spellar nu: " + track.getInfo().title).queue();
 	}
 }

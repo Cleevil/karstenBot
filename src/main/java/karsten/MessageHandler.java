@@ -4,6 +4,8 @@ import jukebox.Jukebox;
 
 import net.dv8tion.jda.core.entities.ChannelType;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -12,6 +14,13 @@ public class MessageHandler extends ListenerAdapter{
 	
 	public MessageHandler() {
 		jukebox = new Jukebox();
+	}
+	
+	@Override
+	public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
+		// TODO Auto-generated method stub
+		super.onGuildVoiceUpdate(event);
+		jukebox.onGuildVoiceUpdate(event);
 	}
 	
 	@Override
@@ -48,6 +57,9 @@ public class MessageHandler extends ListenerAdapter{
 		case STOP:
 			jukebox.stop(chatMessage.textChannel);
 			break;
+		case SONGINFO:
+			jukebox.songInfo(chatMessage.textChannel);
+			break;
 		case UPVOTE:
 			jukebox.giveVote(chatMessage.textChannel, chatMessage.author, 1);
 			break;
@@ -77,12 +89,16 @@ public class MessageHandler extends ListenerAdapter{
 	void printHelp(TextChannel channel) {
 		String helpStr = "Tillgängliga kommandon: \n"
 				+ "```md\n" // Just to highlight something - http or md
-				+ "!ping        : pong \n"
-				+ "!play <link> : Plays given YouTube <link> \n"
-				+ "!yt <query>  : Search YouTube for <query> \n"
-				+ "!skip        : Skip current song \n"
-				+ "!stop        : Karsten stops \n"
-				+ "!leave       : Karsten leaves voice channel \n"
+				+ "!ping           : pong \n"
+				+ "!play <link>    : Plays given YouTube <link> \n"
+				+ "!yt <query>     : Search YouTube for <query> \n"
+				+ "!skip           : Skip current song \n"
+				+ "!stop           : Karsten stops \n"
+				+ "!song           : Displays the current song \n"
+				+ "!list           : Lists the songs in queue \n"
+				+ "!uv | !upvote   : Upvote current song \n"
+				+ "!dv | !downvote : Downvote current song \n"
+				+ "!leave          : Karsten leaves voice channel \n"
 				+ "```";
 		channel.sendMessage(helpStr).queue();
 	}

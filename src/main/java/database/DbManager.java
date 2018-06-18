@@ -307,7 +307,9 @@ public class DbManager {
 			
 			stmt = c.createStatement();
 			String sql = "SELECT value FROM votes "
-					+ "WHERE guildID ="+guild.getId()+";";
+					+ "WHERE guildID ="+guild.getId()+" "
+					+ "AND trackID ='"+track.getIdentifier()+"';";
+			
 
 			debugMsg.setStatement(sql);
 			ResultSet rs = stmt.executeQuery(sql);
